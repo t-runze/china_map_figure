@@ -66,9 +66,9 @@ pip install -r requirements.txt
 
 修改后重新运行脚本即可。
 
-## 直方图生成工具
+## 直方图 / 折线图生成工具
 
-[histogram.py](histogram.py) 用于生成可自定义的直方图（柱状图），同样输出高分辨率 PNG 与矢量 PDF 到 `figure/` 目录。
+[histogram.py](histogram.py) 用于生成可自定义的**直方图（柱状图）**或**折线图**，同样输出高分辨率 PNG 与矢量 PDF 到 `figure/` 目录。通过 `CHART_TYPE` 切换两种图型。
 
 ### 运行
 
@@ -87,12 +87,15 @@ pip install -r requirements.txt
 
 | 配置项 | 作用 |
 | --- | --- |
+| `CHART_TYPE` | 图表类型：`"bar"` 直方图 / `"line"` 折线图 |
 | `BAR_LABELS` | 横轴每个方块的子名称（类别标签） |
 | `BAR_VALUES` | 每根柱子对应的数值（与 `BAR_LABELS` 一一对应） |
 | `X_AXIS_NAME` / `Y_AXIS_NAME` | 横、纵轴名称 |
 | `SHOW_TITLE` | 是否显示标题 |
 | `TITLE` | 图标题 |
 | `BAR_COLORS` | 柱子颜色（单色或与柱子数等长的列表） |
+| `LINE_COLOR` / `LINE_WIDTH` / `LINE_STYLE` | 折线颜色 / 线宽 / 样式（仅折线图） |
+| `MARKER` / `MARKER_SIZE` | 折线数据点标记 / 大小（仅折线图） |
 | `SHOW_Y_GRID` | 是否显示纵轴网格线 |
 | `GRID_COLOR` / `GRID_LINESTYLE` / `GRID_LINEWIDTH` | 网格线颜色 / 样式 / 宽度 |
 | `SHOW_VALUE_LABELS` | 是否在柱顶标注数值 |
