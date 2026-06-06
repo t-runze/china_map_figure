@@ -33,27 +33,55 @@ from shapely.geometry import shape
 # --- 1.1 图例：每个“类别”对应一种颜色和一段含义说明（图例文字即类别名） ---
 #     想增删类别 / 改颜色，直接改这个字典即可。
 CATEGORY_COLORS = {
-    "一类城市（示例）": "#d73027",
-    "二类城市（示例）": "#fc8d59",
-    "三类城市（示例）": "#fee090",
-    "其他城市（示例）": "#91bfdb",
+    "2020年进行了省以下财政事权划分改革的城市": "#b5e2a7",
+    "2021年进行了省以下财政事权划分改革的城市": "#e7f5b8",
+    "2022年进行了省以下财政事权划分改革的城市": "#ffc981",
 }
 
-# --- 1.2 城市 -> 类别 的映射。键是城市全名（带“市”），值是上面字典里的某个类别 ---
-#     没有列入下表的城市，统一使用 DEFAULT_COLOR 显示。
-CITY_CATEGORY = {
-    "北京市": "一类城市（示例）",
-    "上海市": "一类城市（示例）",
-    "广州市": "二类城市（示例）",
-    "深圳市": "二类城市（示例）",
-    "成都市": "三类城市（示例）",
-    "武汉市": "三类城市（示例）",
+# --- 1.2 省份 -> 类别 的映射。键是省/直辖市/自治区名，值是上面字典里的某个类别 ---
+#     支持简写（如“广西”“内蒙古”“西藏”“宁夏”“新疆”），同省所有城市统一着色。
+#     未列入下表的省份，其城市统一使用 DEFAULT_COLOR 显示。
+PROVINCE_CATEGORY = {
+    # 2020 年
+    "北京市": "2020年进行了省以下财政事权划分改革的城市",
+    "河北省": "2020年进行了省以下财政事权划分改革的城市",
+    "广西壮族自治区": "2020年进行了省以下财政事权划分改革的城市",
+    # 2021 年
+    "天津市": "2021年进行了省以下财政事权划分改革的城市",
+    "山西省": "2021年进行了省以下财政事权划分改革的城市",
+    "内蒙古自治区": "2021年进行了省以下财政事权划分改革的城市",
+    "辽宁省": "2021年进行了省以下财政事权划分改革的城市",
+    "吉林省": "2021年进行了省以下财政事权划分改革的城市",
+    "黑龙江省": "2021年进行了省以下财政事权划分改革的城市",
+    "江苏省": "2021年进行了省以下财政事权划分改革的城市",
+    "浙江省": "2021年进行了省以下财政事权划分改革的城市",
+    "安徽省": "2021年进行了省以下财政事权划分改革的城市",
+    "福建省": "2021年进行了省以下财政事权划分改革的城市",
+    "江西省": "2021年进行了省以下财政事权划分改革的城市",
+    "山东省": "2021年进行了省以下财政事权划分改革的城市",
+    "河南省": "2021年进行了省以下财政事权划分改革的城市",
+    "湖北省": "2021年进行了省以下财政事权划分改革的城市",
+    "湖南省": "2021年进行了省以下财政事权划分改革的城市",
+    "海南省": "2021年进行了省以下财政事权划分改革的城市",
+    "重庆市": "2021年进行了省以下财政事权划分改革的城市",
+    "四川省": "2021年进行了省以下财政事权划分改革的城市",
+    "贵州省": "2021年进行了省以下财政事权划分改革的城市",
+    "云南省": "2021年进行了省以下财政事权划分改革的城市",
+    "西藏自治区": "2021年进行了省以下财政事权划分改革的城市",
+    "陕西省": "2021年进行了省以下财政事权划分改革的城市",
+    "甘肃省": "2021年进行了省以下财政事权划分改革的城市",
+    "青海省": "2021年进行了省以下财政事权划分改革的城市",
+    "宁夏回族自治区": "2021年进行了省以下财政事权划分改革的城市",
+    "新疆维吾尔自治区": "2021年进行了省以下财政事权划分改革的城市",
+    # 2022 年
+    "上海市": "2022年进行了省以下财政事权划分改革的城市",
+    "广东省": "2022年进行了省以下财政事权划分改革的城市",
 }
 
 # --- 1.3 未分类城市的默认填充色，以及是否在图例中显示“未分类” ---
 DEFAULT_COLOR = "#f0f0f0"
 SHOW_UNCLASSIFIED_IN_LEGEND = True
-UNCLASSIFIED_LABEL = "未分类城市"
+UNCLASSIFIED_LABEL = "没有进行省以下财政事权划分改革的城市"
 
 # --- 1.4 输出设置 ---
 OUTPUT_BASENAME = "china_city_map"   # 输出文件名（不含扩展名）
@@ -82,8 +110,13 @@ SINGLE_UNIT_ADCODES = {
 }
 
 
+def is_cached(adcode):
+    """判断某个行政区的数据是否已在本地缓存。"""
+    return os.path.exists(os.path.join(DATA_DIR, f"{adcode}_full.json"))
+
+
 def fetch_json(adcode, retries=3):
-    """下载某个行政区的 _full GeoJSON，带本地缓存与重试。"""
+    """下载某个行政区的 _full GeoJSON，带本地缓存与重试。已有缓存则直接读取，不重新下载。"""
     os.makedirs(DATA_DIR, exist_ok=True)
     cache = os.path.join(DATA_DIR, f"{adcode}_full.json")
     if os.path.exists(cache):
@@ -108,7 +141,7 @@ def fetch_json(adcode, retries=3):
 
 def build_city_geodataframe():
     """组装全国市级 GeoDataFrame。"""
-    print("下载全国省级边界...")
+    print("读取缓存" if is_cached(CHINA_ADCODE) else "下载", "全国省级边界...")
     china = fetch_json(CHINA_ADCODE)
 
     records = []        # 市级记录
@@ -131,17 +164,17 @@ def build_city_geodataframe():
 
         if adcode in SINGLE_UNIT_ADCODES:
             # 直辖市/特别行政区/台湾，整体作为一个“市”
-            records.append({"city": name, "adcode": adcode,
+            records.append({"city": name, "province": name, "adcode": adcode,
                             "geometry": shape(feat["geometry"])})
             continue
 
         # 普通省份：下钻获取地级市
-        print(f"下载 {name} 的市级边界...")
+        print(f"{'读取缓存' if is_cached(adcode) else '下载'} {name} 的市级边界...")
         try:
             prov = fetch_json(adcode)
         except RuntimeError as e:
             print(f"  跳过 {name}: {e}")
-            records.append({"city": name, "adcode": adcode,
+            records.append({"city": name, "province": name, "adcode": adcode,
                             "geometry": shape(feat["geometry"])})
             continue
 
@@ -151,6 +184,7 @@ def build_city_geodataframe():
             cprops = city_feat.get("properties", {})
             records.append({
                 "city": cprops.get("name"),
+                "province": name,
                 "adcode": str(cprops.get("adcode")),
                 "geometry": shape(city_feat["geometry"]),
             })
@@ -166,16 +200,26 @@ def build_city_geodataframe():
 # 3. 配色
 # =============================================================================
 
-def resolve_color(city_name):
-    """根据城市名返回填充色（支持去掉“市/地区”后缀的宽松匹配）。"""
-    if city_name in CITY_CATEGORY:
-        return CATEGORY_COLORS.get(CITY_CATEGORY[city_name], DEFAULT_COLOR)
-    # 宽松匹配：用户字典里写了不带后缀的名字时也能命中
-    for suffix in ("市", "地区", "自治州", "盟"):
-        if city_name and city_name.endswith(suffix):
-            base = city_name[: -len(suffix)]
-            if base in CITY_CATEGORY:
-                return CATEGORY_COLORS.get(CITY_CATEGORY[base], DEFAULT_COLOR)
+def resolve_color(province_name):
+    """根据所属省份返回填充色（支持省名简写的宽松匹配）。"""
+    if not province_name:
+        return DEFAULT_COLOR
+    if province_name in PROVINCE_CATEGORY:
+        return CATEGORY_COLORS.get(PROVINCE_CATEGORY[province_name], DEFAULT_COLOR)
+    # 宽松匹配：去掉常见后缀后按前缀比较
+    suffixes = ("壮族自治区", "回族自治区", "维吾尔自治区",
+                "特别行政区", "自治区", "省", "市")
+
+    def normalize(n):
+        for s in suffixes:
+            if n.endswith(s):
+                return n[: -len(s)]
+        return n
+
+    target = normalize(province_name)
+    for key, cat in PROVINCE_CATEGORY.items():
+        if normalize(key) == target:
+            return CATEGORY_COLORS.get(cat, DEFAULT_COLOR)
     return DEFAULT_COLOR
 
 
@@ -229,7 +273,7 @@ def add_scale_bar(ax, length_km=1000, location=(0.62, 0.06), height=0.012):
     for frac, label in [(0, "0"), (0.5, f"{length_km//2}"), (1.0, f"{length_km}")]:
         ax.text(x0 + bar_len * frac, y0 + bar_h * 1.4, label,
                 ha="center", va="bottom", fontsize=9, zorder=6)
-    ax.text(x0 + bar_len, y0 + bar_h * 1.4, " km",
+    ax.text(x0 + bar_len + bar_len * 0.1, y0 + bar_h * 1.4, "km",
             ha="left", va="bottom", fontsize=9, zorder=6)
 
 
@@ -272,8 +316,8 @@ def main():
     if gdf_line is not None:
         gdf_line = gdf_line.to_crs(albers)
 
-    # 上色
-    gdf_city["fill"] = gdf_city["city"].apply(resolve_color)
+    # 上色（按所属省份分类）
+    gdf_city["fill"] = gdf_city["province"].apply(resolve_color)
 
     # 绘图
     fig, ax = plt.subplots(figsize=(12, 10))
@@ -286,24 +330,20 @@ def main():
 
     ax.set_aspect("equal")
     ax.axis("off")
-    if TITLE:
-        ax.set_title(TITLE, fontsize=20, fontweight="bold", pad=12)
 
     # 装饰元素
     add_north_arrow(ax)
-    add_scale_bar(ax, length_km=1000)
 
     legend = ax.legend(
         handles=build_legend_handles(),
-        title="图例",
         loc="lower left",
-        bbox_to_anchor=(0.01, 0.01),
-        frameon=True,
-        framealpha=0.9,
+        bbox_to_anchor=(0.01, 0.10),
+        frameon=False,
         fontsize=11,
-        title_fontsize=12,
     )
-    legend.get_frame().set_edgecolor("#333333")
+
+    # 比例尺放在图例下方（左下角）
+    add_scale_bar(ax, length_km=1000, location=(0.02, 0.04))
 
     fig.tight_layout()
 
