@@ -32,11 +32,12 @@ X_AXIS_NAME = "类别"
 Y_AXIS_NAME = "数量"
 
 # --- 1.3 图标题 ---
+SHOW_TITLE = True           # 是否显示标题
 TITLE = "示例直方图"
 
 # --- 1.4 柱子颜色 ---
 #     给一个颜色 -> 所有柱子同色；给一个列表（长度与柱子数相同）-> 每根柱子单独配色。
-BAR_COLORS = ["#b5e2a7", "#e7f5b8", "#ffc981", "#8ecae6", "#f4978e"]
+BAR_COLORS = ["#00b141"]
 
 # --- 1.5 网格线（grid）设置 ---
 SHOW_Y_GRID = True          # 是否显示纵轴方向的网格线
@@ -95,7 +96,7 @@ def main():
     ax.set_ylabel(Y_AXIS_NAME, fontsize=13, fontweight="bold")
 
     # 标题
-    if TITLE:
+    if SHOW_TITLE and TITLE:
         ax.set_title(TITLE, fontsize=16, fontweight="bold", pad=12)
 
     # 纵轴网格线

@@ -66,6 +66,41 @@ pip install -r requirements.txt
 
 修改后重新运行脚本即可。
 
+## 直方图生成工具
+
+[histogram.py](histogram.py) 用于生成可自定义的直方图（柱状图），同样输出高分辨率 PNG 与矢量 PDF 到 `figure/` 目录。
+
+### 运行
+
+```powershell
+.venv\Scripts\python.exe histogram.py
+```
+
+输出文件：
+
+- `figure/histogram.png`（300 dpi）
+- `figure/histogram.pdf`（矢量）
+
+### 自定义
+
+打开 [histogram.py](histogram.py)，修改顶部「用户自定义区域」：
+
+| 配置项 | 作用 |
+| --- | --- |
+| `BAR_LABELS` | 横轴每个方块的子名称（类别标签） |
+| `BAR_VALUES` | 每根柱子对应的数值（与 `BAR_LABELS` 一一对应） |
+| `X_AXIS_NAME` / `Y_AXIS_NAME` | 横、纵轴名称 |
+| `SHOW_TITLE` | 是否显示标题 |
+| `TITLE` | 图标题 |
+| `BAR_COLORS` | 柱子颜色（单色或与柱子数等长的列表） |
+| `SHOW_Y_GRID` | 是否显示纵轴网格线 |
+| `GRID_COLOR` / `GRID_LINESTYLE` / `GRID_LINEWIDTH` | 网格线颜色 / 样式 / 宽度 |
+| `SHOW_VALUE_LABELS` | 是否在柱顶标注数值 |
+| `BAR_WIDTH` / `FIGSIZE` | 柱宽 / 画布尺寸 |
+| `OUTPUT_BASENAME` / `DPI` / `SAVE_PDF` | 输出文件名 / 分辨率 / 是否输出 PDF |
+
+修改后重新运行脚本即可。
+
 ## 数据来源
 
 行政区划边界数据版权归阿里 DataV 所有，仅供学习与研究使用。
