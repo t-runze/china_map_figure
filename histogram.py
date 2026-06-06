@@ -23,7 +23,7 @@ import matplotlib.font_manager as fm
 # =============================================================================
 
 # --- 1.0 图表类型："bar" 直方图 / "line" 折线图 ---
-CHART_TYPE = "line"
+CHART_TYPE = "bar"
 
 # --- 1.1 数据：横轴每个方块的子名称 + 对应的数值（两者一一对应） ---
 #     想增删柱子 / 改数值，直接改这两个列表即可（长度必须相同）。
@@ -31,7 +31,7 @@ BAR_LABELS = ["2020", "2021", "2022"]
 BAR_VALUES = [3, 26, 2]
 
 # --- 1.2 横、纵轴名称 ---
-X_AXIS_NAME = "实施省以下财政事权划分改革年份"
+X_AXIS_NAME = "省以下财政事权划分改革实施年份"
 Y_AXIS_NAME = "改革省份数目"
 
 # --- 1.3 图标题 ---
@@ -59,7 +59,7 @@ GRID_LINEWIDTH = 0.8        # 网格线宽度
 SHOW_VALUE_LABELS = True  # 是否在每根柱子上方标出数值
 
 # --- 1.7 其它外观 ---
-BAR_WIDTH = 0.4             # 柱子宽度（0~1）
+BAR_WIDTH = 0.2             # 柱子宽度（0~1）
 FIGSIZE = (10, 6)          # 画布尺寸（英寸）
 OUTPUT_BASENAME = "histogram"  # 输出文件名（不含扩展名）
 SAVE_PDF = True

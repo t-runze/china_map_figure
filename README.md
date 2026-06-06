@@ -11,15 +11,17 @@
 
 ## 安装依赖
 
-### 方式一：使用 uv（推荐，速度快）
+### 方式一：使用 anaconda + pip
 
 ```powershell
-# 安装 uv（若尚未安装）：https://docs.astral.sh/uv/
-# 创建虚拟环境
-uv venv .venv --python 3.12
+# 创建 conda 环境（命名为 figure，使用 Python 3.12）
+conda create -n figure python=3.12 -y
+
+# 激活环境
+conda activate figure
 
 # 安装依赖
-uv pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ### 方式二：使用 venv + pip
@@ -38,10 +40,6 @@ pip install -r requirements.txt
 > macOS / Linux 激活命令为 `source .venv/bin/activate`
 
 ## 运行
-
-```powershell
-.venv\Scripts\python.exe china_city_map.py
-```
 
 首次运行会下载全国省市边界（约 30 个文件，缓存到 `data/`），之后再次运行会直接读取缓存，秒出图。
 
